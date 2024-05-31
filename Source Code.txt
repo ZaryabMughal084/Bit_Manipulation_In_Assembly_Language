@@ -1,0 +1,343 @@
+include irvine32.inc
+.data
+Menu_of_functions BYTE"      1) For Left shift bits of a given number  "
+                  BYTE"      2) For Right shift bits of a given number "
+                  BYTE"      3) For toggle the  bits of a given number "
+                  BYTE"      4) For Set(1) the  bits of a given number "
+                  BYTE"      5) For Reset(0) the bits of a given number"
+                  BYTE"      6) For Exit                               ",0
+
+project_name BYTE "--------------------------------------------------------", 13, 10
+             BYTE "---------| BIT MANIPULATION COAL PROJECT | -------------", 13, 10
+             BYTE "--------------------------------------------------------",0
+
+choice BYTE "Enter your choice(1-6):   ",0
+invalid_input BYTE "Please Enter a valid choice!(1-6):   ",0
+
+
+Rows equ 6
+Columns equ 48 ;equ is preprocessor directive same like #define in c++
+
+;data declation for "bit_pos_set" function".
+ input_num BYTE"Enter a number whose bit you want to set:",0
+ bit_pos BYTE"Enter bit position you want to set:",0
+ before_num BYTE"Before setting bit at pos ",0
+ after_num BYTE"After setting bit at position :",0
+ pos BYTE") number is:",0
+ temp_num DWORD ?
+
+ ;data declation for "bit_pos_reset" function".
+ input_num1 BYTE"Enter a number whose bit you want to reset:",0
+ bit_pos1 BYTE"Enter bit position you want to reset:",0
+ before_num1 BYTE"Before resetting bit at pos ",0
+ after_num1 BYTE"After resetting bit at position :",0
+ temp_num1 DWORD ?
+
+ ;data declation for "bit_pos_toggle" function".
+ input_num2 BYTE"Enter a number whose bit you want to toggle:",0
+ bit_pos2 BYTE"Enter bit position you want to toggle:",0
+ before_num2 BYTE"Before toggling bit at pos ",0
+ after_num2 BYTE"After toggling bit at position :",0
+ temp_num2 DWORD ?
+
+ ;data declation for "left and right shift" function".
+ input_num3 BYTE"Enter a number :",0
+ bit_pos3 BYTE"Enter num of shifts:",0
+ before_num3 BYTE"Before right shift bits for bit shift ",0
+ after_num3 BYTE"After right shift bits for bit shift ",0
+ temp_num3 DWORD ?
+ before_num4 BYTE"Before left shift bits for bit shift ",0
+ after_num4 BYTE"After left shift bits for bit shift ",0
+ temp_num4 DWORD ?
+
+
+
+
+
+
+.code
+main PROC
+call caller_function
+exit
+main endp
+;display function to display menu
+display proc
+call crlf
+call crlf
+mov edx,offset project_name
+call writestring
+call crlf
+call crlf
+
+mov ebx,offset Menu_of_functions
+mov ch , Rows
+L2:
+mov cl , Columns
+mov esi , 0
+L1:
+mov al , [ebx+esi]
+call writechar
+inc esi
+dec cl
+Jnz L1
+call crlf
+add ebx, columns
+dec ch 
+Jnz L2
+call crlf
+mov edx,offset choice
+call writestring
+call crlf
+ret
+display endp
+
+;caller function to call user specific function
+caller_function proc
+dlabel:
+call display
+call readint
+cmp eax,1
+JB check_again
+cmp eax, 6
+JA check_again
+jmp options
+
+
+check_again:
+mov edx,offset invalid_input
+call writestring
+jmp dlabel
+
+options:
+    cmp eax, 1
+    je option1
+    cmp eax, 2
+    je option2
+    cmp eax, 3
+    je option3
+    cmp eax, 4
+    je option4
+    cmp eax, 5
+    je option5
+    jmp option6
+option1:
+    call bit_left_shift
+    jmp dlabel
+option2:
+    call bit_right_shift
+    jmp dlabel
+option3:
+    call bit_pos_toggle
+    jmp dlabel
+option4:
+    call bit_pos_set
+    jmp dlabel
+option5:
+    call bit_pos_reset
+    jmp dlabel
+option6:
+jmp last
+
+last:
+    ret
+caller_function endp
+
+
+bit_pos_set proc  ;function to set specified bit of any number
+mov edx,offset input_num
+call writestring
+call readint
+mov temp_num,eax ;temporary store num in temp_num
+mov edx,offset bit_pos
+call writestring
+call readint
+mov ecx,eax ;store bit pos in ecx
+; display num before
+mov edx,offset before_num
+call writestring
+call writeint
+;display pos string
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num
+;display num
+call writeint
+bts eax,ecx
+call crlf
+; display num after operation
+mov edx,offset after_num
+call writestring
+;tempory store num in temp_num again
+mov temp_num,eax 
+mov eax,ecx
+call writeint
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num
+;display num
+call writeint
+ret 
+bit_pos_set endp
+
+;function to clear bit
+
+bit_pos_reset proc  ;function to reset specified bit of any number
+mov edx,offset input_num1
+call writestring
+call readint
+mov temp_num1,eax ;temporary store num in temp_num
+mov edx,offset bit_pos1
+call writestring
+call readint
+mov ecx,eax ;store bit pos in ecx
+; display num before
+mov edx,offset before_num1
+call writestring
+call writeint
+;display pos1 string
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num1
+;display num
+call writeint
+btr eax,ecx
+call crlf
+; display num after operation
+mov edx,offset after_num1
+call writestring
+;tempory store num in temp_num again
+mov temp_num1,eax 
+mov eax,ecx
+call writeint
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num1
+;display num
+call writeint
+ret 
+bit_pos_reset endp
+
+;function to toggle bit
+
+bit_pos_toggle proc  ;function to toggle specified bit of any number
+mov edx,offset input_num2
+call writestring
+call readint
+mov temp_num2,eax ;temporary store num in temp_num2
+mov edx,offset bit_pos2
+call writestring
+call readint
+mov ecx,eax ;store bit pos in ecx
+; display num before
+mov edx,offset before_num2
+call writestring
+call writeint
+;display pos string
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num2
+;display num
+call writeint
+btc eax,ecx
+call crlf
+; display num after operation
+mov edx,offset after_num2
+call writestring
+;tempory store num in temp_num2 again
+mov temp_num2,eax 
+mov eax,ecx
+call writeint
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num2
+;display num
+call writeint
+ret 
+bit_pos_toggle endp
+
+
+bit_right_shift proc  ;function to right shift the bits by specified shift 
+mov edx,offset input_num3
+call writestring
+call readint
+mov temp_num3,eax ;temporary store num in temp_num3
+mov edx,offset bit_pos3
+call writestring
+call readint
+mov ecx,eax ;store bit shift in ecx
+; display num before
+mov edx,offset before_num3
+call writestring
+call writeint
+;display pos string
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num3
+;display num
+call writeint
+  shr eax, cl ;btc eax,ecx
+call crlf
+; display num after operation
+mov edx,offset after_num3
+call writestring
+;tempory store num in temp_num3 again
+mov temp_num3,eax 
+mov eax,ecx
+call writeint
+mov edx,offset pos
+call writestring
+;display shifts of bit
+mov eax,temp_num3
+;display num
+call writeint
+ret 
+bit_right_shift endp
+
+bit_left_shift proc  ;function to left shift the bits by specified shift 
+mov edx,offset input_num3
+call writestring
+call readint
+mov temp_num4,eax ;temporary store num in temp_num4
+mov edx,offset bit_pos3
+call writestring
+call readint
+mov ecx,eax ;store bit shift in ecx
+; display num before
+mov edx,offset before_num4
+call writestring
+call writeint
+;display pos string
+mov edx,offset pos
+call writestring
+;display pos of bit
+mov eax,temp_num4
+;display num
+call writeint
+  shl eax, cl ;btc eax,ecx
+call crlf
+; display num after operation
+mov edx,offset after_num4
+call writestring
+;tempory store num in temp_num4 again
+mov temp_num4,eax 
+mov eax,ecx
+call writeint
+mov edx,offset pos
+call writestring
+;display shifts of bit
+mov eax,temp_num4
+;display num
+call writeint
+ret 
+bit_left_shift endp
+
+
+
+end main
